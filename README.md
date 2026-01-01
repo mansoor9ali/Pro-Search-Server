@@ -1,13 +1,25 @@
-# Pro-Search-Server
+# Pro-Search-Agent-Server
 
 [![LangGraph](https://img.shields.io/badge/LangGraph-Powered-blue)](https://github.com/langchain-ai/langgraph)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Google Gemini](https://img.shields.io/badge/Gemini-2.0%20%7C%202.5-orange)](https://ai.google.dev/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
 An advanced AI-powered research agent built with LangGraph that generates optimized search queries, performs comprehensive web research with Google Search API, and delivers well-cited, accurate answers through an iterative reflection process.
 
+**Pro-Search-Agent-Server** is a production-ready research automation system that combines the power of Google's Gemini models with intelligent web search capabilities. The agent autonomously breaks down complex questions, conducts parallel web research, evaluates the quality of gathered information, and synthesizes comprehensive answers with proper source attribution.
+
+### Key Highlights
+
+✅ **Self-Improving Research**: Iterative reflection loop identifies knowledge gaps and refines research  
+✅ **Enterprise-Grade Reliability**: Comprehensive error handling, retry logic, and graceful degradation  
+✅ **Full Transparency**: Every fact is backed by citations with source URLs  
+✅ **Production-Ready**: Detailed logging, monitoring, and observability with LangSmith  
+✅ **Highly Configurable**: Adjust models, research depth, and query count per use case  
+
 <div align="center">
   <img src="./static/graph.png" alt="Graph view in LangGraph Studio UI" width="75%" />
+  <p><em>Visual representation of the Pro-Search agent workflow in LangGraph Studio</em></p>
 </div>
 
 ## 🚀 Features
@@ -17,8 +29,12 @@ An advanced AI-powered research agent built with LangGraph that generates optimi
 - **Iterative Reflection Loop**: Self-evaluates research quality and identifies knowledge gaps
 - **Automatic Citation Management**: Tracks and inserts citations with URL resolution
 - **Multi-Model Architecture**: Strategically uses different Gemini models for specific tasks
+- **Robust Error Handling**: Comprehensive error recovery with retry logic and graceful degradation
+- **Advanced Logging**: Detailed logging for debugging and monitoring with configurable levels
+- **Performance Optimizations**: LRU caching for API clients and efficient token management
+- **Parallel Web Research**: Concurrent search query execution for faster results
 - **FastAPI Backend**: Production-ready API with React frontend integration
-- **LangSmith Integration**: Built-in tracing and observability
+- **LangSmith Integration**: Built-in tracing and observability for debugging and optimization
 
 ## 📊 Agent Architecture
 
@@ -224,17 +240,50 @@ curl -X POST http://localhost:2024/threads/<thread_id>/runs/stream \
 - **Gemini 2.5 Flash**: Balanced reflection and evaluation
 - **Gemini 2.5 Pro**: High-quality final answer synthesis
 
+### Error Handling & Resilience
+- **Automatic Retry Logic**: Up to 3 retries for Google API calls with exponential backoff
+- **Graceful Degradation**: Partial results returned on failures instead of complete failure
+- **Comprehensive Logging**: INFO-level logging for workflow tracking, ERROR-level for issues
+- **Input Validation**: Validates state and configuration at each node
+- **Exception Recovery**: Catches and logs exceptions while maintaining workflow continuity
+
+### Performance Optimizations
+- **LRU Caching**: Cached Google GenAI client initialization to reduce overhead
+- **Factory Pattern**: Centralized LLM creation with `create_llm()` for consistency
+- **Parallel Execution**: Web research queries run concurrently using LangGraph's `Send` API
+- **URL Resolution**: Short URL codes minimize token usage in intermediate processing
+- **Token Efficiency**: Citation markers inserted only after final answer generation
+
 ### Citation System
-- Automatic source tracking via grounding metadata
-- URL resolution for token efficiency
-- Inline citation markers (e.g., `[1]`, `[2]`)
-- Deduplication of sources in final output
+- **Automatic Source Tracking**: Via grounding metadata from Google Search API
+- **URL Resolution**: Long Vertex AI Search URLs replaced with short codes
+- **Inline Citation Markers**: Markdown-formatted links (e.g., `[source](url)`)
+- **Deduplication**: Only sources actually used in final answer are returned
+- **Bidirectional Mapping**: Short codes resolved back to original URLs in final output
 
 ### State Management
-- `OverallState`: Main graph state with message history
-- `QueryGenerationState`: Search query list
-- `WebSearchState`: Individual search execution
-- `ReflectionState`: Evaluation and follow-up queries
+- **OverallState**: Main graph state with message history and accumulated results
+- **QueryGenerationState**: Search query list with rationale
+- **WebSearchState**: Individual search execution with unique IDs
+- **ReflectionState**: Evaluation results and follow-up queries
+- **Type Safety**: TypedDict schemas ensure type correctness across nodes
+
+## 💎 Code Quality & Best Practices
+
+### Architectural Improvements
+- **Factory Pattern**: Centralized `create_llm()` function for consistent LLM instantiation
+- **Dependency Injection**: Configuration passed through RunnableConfig
+- **Single Responsibility**: Each node has a single, well-defined purpose
+- **Comprehensive Documentation**: Detailed docstrings with Args, Returns, and Raises sections
+- **Type Hints**: Full type annotations for better IDE support and type checking
+
+### Production-Ready Features
+- **Environment Validation**: API keys validated on startup with clear error messages
+- **Structured Logging**: Hierarchical logging with timestamps and log levels
+- **Error Context**: Exception stack traces captured for debugging
+- **Retry Mechanisms**: Configurable retry logic with exponential backoff
+- **Graceful Failures**: Workflow continues with partial results when possible
+- **Resource Management**: Cached clients to reduce initialization overhead
 
 ## 🤝 Contributing
 
@@ -263,10 +312,36 @@ MIT License - See [LICENSE](./LICENSE) for details
 
 **GEMINI_API_KEY not set error**
 - Verify `.env` file exists and contains `GEMINI_API_KEY`
+- Check that the API key is valid and not expired
+- Ensure no extra spaces or quotes around the API key
 
 **LangSmith tracing not working**
 - Set `LANGSMITH_TRACING=true` in `.env`
 - Verify `LANGSMITH_API_KEY` is valid
+- Check LangSmith dashboard for incoming traces
+
+**Google API rate limit errors**
+- Implement request throttling in your application
+- Check your Google Cloud quota limits
+- Consider upgrading your API plan
+- The agent includes automatic retry logic with exponential backoff
+
+**Web search returns no results**
+- Verify `GOOGLE_API_KEY` is configured correctly
+- Check Google Search API quota and billing status
+- Review logs for specific error messages
+- The agent will attempt up to 3 retries before failing
+
+**Module import errors**
+- Ensure all dependencies are installed: `pip install -e .`
+- Check Python version is 3.12 or higher: `python --version`
+- Verify virtual environment is activated
+
+**Graph execution hangs**
+- Check LangSmith traces for stuck nodes
+- Review logs for timeout or API errors
+- Consider reducing `max_research_loops` parameter
+- Verify network connectivity to Google APIs
 
 ---
 
