@@ -5,39 +5,10 @@ This document describes the LangGraph workflow visualization shown in LangSmith 
 ## Graph Structure
 
 The Pro-Search-Server agent implements the following workflow:
+<div align="center">
+  <img src="./static/graph.png" alt="Graph view in LangGraph Studio UI" width="75%" />
+</div>
 
-```
-┌──────────┐
-│ __start__ │
-└─────┬────┘
-      │
-      ▼
-┌─────────────────┐
-│ generate_query  │  (Red node - Entry point)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ web_research    │  (Yellow node - Parallel execution)
-└────────┬────────┘
-         │
-         ▼ ◄───┐
-┌─────────────────┐  │
-│   reflection    │  │  (Green node - Self-loop for iteration)
-└────────┬────────┘  │
-         │           │
-         └───────────┘
-         │
-         ▼
-┌─────────────────┐
-│ finalize_answer │  (Red node - Final synthesis)
-└────────┬────────┘
-         │
-         ▼
-   ┌──────────┐
-   │  __end__ │
-   └──────────┘
-```
 
 ## Node Details
 

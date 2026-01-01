@@ -7,7 +7,7 @@
 An advanced AI-powered research agent built with LangGraph that generates optimized search queries, performs comprehensive web research with Google Search API, and delivers well-cited, accurate answers through an iterative reflection process.
 
 <div align="center">
-  <img src="./static/studio_ui.png" alt="Graph view in LangGraph Studio UI" width="75%" />
+  <img src="./static/graph.png" alt="Graph view in LangGraph Studio UI" width="75%" />
 </div>
 
 ## 🚀 Features
